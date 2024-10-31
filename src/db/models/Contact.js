@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, version } from "mongoose";
 
 const contactSchema = new Schema({
     name: {
@@ -23,8 +23,8 @@ const contactSchema = new Schema({
         default: "personal",
     }
 }, {
-    timestamps: true, 
-});
+    timestamps: true,
+}, {versionKey: false, timestamps: true});
 
 const ContactCollection = model("contact", contactSchema);
 
