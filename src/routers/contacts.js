@@ -8,7 +8,7 @@ contactsRouter.get("/", ctrlWrapper(contactControllers.getContactsController));
 
 contactsRouter.get("/:contactId", ctrlWrapper(contactControllers.getContactByIdController));
 
-contactsRouter.post("/", ctrlWrapper(contactControllers.addContactController));
+contactsRouter.post("/contacts", ctrlWrapper(contactControllers.addContactController));
 
 contactsRouter.put("/:contactId", ctrlWrapper(contactControllers.upsertContactController));
 

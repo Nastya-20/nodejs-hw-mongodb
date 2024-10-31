@@ -33,7 +33,7 @@ export const addContactController = async (req, res) => {
     });
 };
 export const upsertContactController = async (req, res) => {
-    const { id: _contactId } = req.params;
+    const { contactId: _contactId } = req.params;
     const result = await contactServices.updateContact({
         _contactId, payload: req.body, options: {
         upsert: true,
@@ -49,7 +49,7 @@ export const upsertContactController = async (req, res) => {
 };
 
 export const patchContactController = async (req, res) => {
-    const { id: _contactId } = req.params;
+    const { contactId: _contactId } = req.params;
 
     const result = await contactServices.updateContact({ _contactId, payload: req.body });
 
