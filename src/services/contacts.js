@@ -27,5 +27,7 @@ export const updateContact = async ({ _contactId, payload, options = {} }) => {
     };
 };
 
-export const deleteContact = async filter => ContactCollection.findOneAndDelete(filter);
+export const deleteContact = async filter => {
+    return await ContactCollection.findOneAndDelete(filter);
+};
 
