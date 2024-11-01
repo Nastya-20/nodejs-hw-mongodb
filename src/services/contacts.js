@@ -13,7 +13,7 @@ export const addContact = async (payload) => {
 };
 
 export const updateContact = async ({ _contactId, payload, options = {} }) => {
-    const rawResult = await ContactCollection.findOneAndUpdate({ _contactId }, payload, {
+    const rawResult = await ContactCollection.findOneAndUpdate({ _id:_contactId }, payload, {
         ...options,
         new: true,
         includeResultMetadata: true,
@@ -27,5 +27,7 @@ export const updateContact = async ({ _contactId, payload, options = {} }) => {
     };
 };
 
-export const deleteContact = async filter => ContactCollection.findOneAndDelete(filter);
+export const deleteContact = async filter => {
+    return await ContactCollection.findOneAndDelete(filter);
+};
 

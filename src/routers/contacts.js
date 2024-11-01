@@ -17,3 +17,5 @@ contactsRouter.patch("/:contactId", ctrlWrapper(contactControllers.patchContactC
 contactsRouter.delete("/:contactId", ctrlWrapper(contactControllers.deleteContactController));
 
 export default contactsRouter;
+
+
