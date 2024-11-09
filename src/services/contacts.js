@@ -2,23 +2,33 @@ import ContactCollection from "../db/models/Contact.js";
 import { calculatePaginationData } from "../utils/calculatePaginationData.js";
 import { parseContactFilterParams } from "../utils/parseContactFilterParams.js";
 
-export const getContacts = async ({ page = 1, perPage = 10, sortBy = "_contactId", sortOrder = "asc", filter = {} }) => {
+export const getContacts = async ({
+    page = 1,
+    perPage = 10,
+    sortBy = "_contactId",
+    sortOrder = "asc",
+    filter = {}
+}) => {
     try {
         const parsedFilters = parseContactFilterParams(filter);
 
         const skip = (page - 1) * perPage;
-        const query = ContactCollection.find().skip(skip).limit(perPage).sort({ [sortBy]: sortOrder }).exec();
+
+        let query = ContactCollection.find();
 
         if (parsedFilters.contactType) {
-            query.where('contactType').equals(parsedFilters.contactType);
+            query = query.where('contactType').equals(parsedFilters.contactType);
         }
         if (parsedFilters.isFavourite !== undefined) {
-            query.where('isFavourite').equals(parsedFilters.isFavourite);
+            query = query.where('isFavourite').equals(parsedFilters.isFavourite);
         }
 
-        const data = await query;
+        query = query.skip(skip).limit(perPage).sort({ [sortBy]: sortOrder });
 
-        const totalItems = await ContactCollection.find().merge(query).countDocuments();
+        const data = await query.exec();
+
+        const totalItems = await ContactCollection.countDocuments(query.getFilter());
+
         const paginationData = calculatePaginationData({ totalItems, page, perPage });
 
         return {
