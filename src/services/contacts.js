@@ -22,6 +22,9 @@ export const getContacts = async ({
         if (parsedFilters.isFavourite !== undefined) {
             query = query.where('isFavourite').equals(parsedFilters.isFavourite);
         }
+        if (filter.userId) {
+            query.where("userId").equals(filter.userId);
+        }
 
         query = query.skip(skip).limit(perPage).sort({ [sortBy]: sortOrder });
 
