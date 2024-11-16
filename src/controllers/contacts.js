@@ -1,45 +1,31 @@
 import createHttpError from "http-errors";
 import * as contactServices from "../services/contacts.js";
 import { parsePaginationParams } from "../utils/parsePaginationParams.js";
-import { calculatePaginationData } from "../utils/calculatePaginationData.js";
 import { parseSortParams } from "../utils/parseSortParams.js";
 import { parseContactFilterParams } from "../utils/parseContactFilterParams.js";
 import { sortByList } from "../db/models/Contact.js";
 
 export const getContactsController = async (req, res, next) => {
-    try {
         const { page, perPage } = parsePaginationParams(req.query);
         const { sortBy, sortOrder } = parseSortParams(req.query, sortByList);
         const filter = parseContactFilterParams(req.query);
         const { _id: userId } = req.user;
         filter.userId = userId;
 
-        const { contacts, total } = await contactServices.getContacts({
+        const data = await contactServices.getContacts({
             page,
             perPage,
             sortBy,
             sortOrder,
             filter,
         });
+    res.status(200).json({
+        status: 200,
+        message: "Successfully found contacts",
+        data,
+    });
+ };
 
-        const paginationData = calculatePaginationData({
-            totalItems: total || 0,
-            page,
-            perPage
-        });
-
-        res.status(200).json({
-            status: 200,
-            message: "Successfully found contacts",
-            data: {
-                data: contacts || [],
-                ...paginationData,
-            },
-        });
-    } catch (error) {
-        next(error);
-    }
-};
 export const getContactByIdController = async (req, res) => {
     const { contactId } = req.params;
     const { _id: userId } = req.user;

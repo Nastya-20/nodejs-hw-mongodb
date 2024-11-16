@@ -11,11 +11,11 @@ export const getContacts = async ({
     userId,
 }) => {
     try {
-        const parsedFilters = parseContactFilterParams(filter);
-
         const skip = (page - 1) * perPage;
 
-        let query = ContactCollection.find({ userId });
+        const parsedFilters = parseContactFilterParams(filter);
+
+        let query = ContactCollection.find();
 
         if (parsedFilters.contactType) {
             query = query.where('contactType').equals(parsedFilters.contactType);
@@ -23,12 +23,15 @@ export const getContacts = async ({
         if (parsedFilters.isFavourite !== undefined) {
             query = query.where('isFavourite').equals(parsedFilters.isFavourite);
         }
+        if (filter.userId) {
+            query.where("userId").equals(filter.userId);
+        }
+
+        const totalItems = await ContactCollection.find({ userId }).merge(query).countDocuments();
 
         query = query.skip(skip).limit(perPage).sort({ [sortBy]: sortOrder });
 
         const data = await query.exec();
-
-        const totalItems = await ContactCollection.countDocuments({userId, ...parsedFilters});
 
         const paginationData = calculatePaginationData({ totalItems, page, perPage });
 
