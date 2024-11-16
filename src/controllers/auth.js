@@ -18,13 +18,13 @@ export const registerController = async (req, res, next) => {
     try {
         const user = await authServices.register(req.body);
 
-        const { _id, username, email, createdAt, updatedAt } = user;
+        const { _id, name, email, createdAt, updatedAt } = user;
 
         res.status(201).json({
             status: 201,
             message: "Successfully registered a user",
             data: {
-                name: username,
+                name: name,
                 email,
                 _id,
                 createdAt,
@@ -70,8 +70,10 @@ export const refreshSessionController = async (req, res) => {
 };
 
 export const logoutController = async (req, res) => {
-    if (!req.cookies.sessionId) {
-        await authServices.logout(req.cookies.sessionId);
+    const { sessionId } = req.cookies;
+
+    if (sessionId) {
+        await authServices.logout(sessionId); 
     }
     res.clearCookie("sessionId");
     res.clearCookie("refreshToken");

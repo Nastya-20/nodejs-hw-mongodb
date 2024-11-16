@@ -3,7 +3,7 @@ import { handleSaveError, setUpdateSettings } from "./hooks.js";
 import { emailRegex } from "../../constants/users.js";
 
 const userSchema = new Schema({
-    username: {
+    name: {
         type: String,
         required: true,
     },

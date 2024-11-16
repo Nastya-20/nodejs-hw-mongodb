@@ -15,7 +15,7 @@ export const getContacts = async ({
 
         const skip = (page - 1) * perPage;
 
-        let query = ContactCollection.find({userId});
+        let query = ContactCollection.find({ userId });
 
         if (parsedFilters.contactType) {
             query = query.where('contactType').equals(parsedFilters.contactType);
@@ -51,21 +51,24 @@ export const addContact = async (payload) => {
 };
 
 export const updateContact = async ({ _contactId, payload, options = {}, userId }) => {
-    const rawResult = await ContactCollection.findOneAndUpdate({ _id:_contactId, userId }, payload, {
+    const updatedContact = await ContactCollection.findOneAndUpdate(
+        { _id: _contactId, userId },
+        payload, {
         ...options,
-        includeResultMetadata: true,
-    });
+        new: true,
+    }
+    );
 
-    if (!rawResult || !rawResult.value) return null;
-
-    return {
-        data: rawResult.value,
-        isNew: Boolean(rawResult.lastErrorObject.upserted),
-    };
+    return updatedContact;
 };
 
-export const deleteContact = async ({_contactId, userId}) => {
-    return await ContactCollection.findOneAndDelete({_id: _contactId, userId});
+export const deleteContact = async (contactId, userId) => {
+       const deletedContact = await ContactCollection.findOneAndDelete({
+        _id: contactId,
+        userId,
+    });
+
+    return deletedContact;
 };
 
 
