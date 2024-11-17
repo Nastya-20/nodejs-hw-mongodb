@@ -53,24 +53,6 @@ export const addContactController = async (req, res) => {
   });
 };
 
-export const upsertContactController = async (req, res) => {
-    const { contactId: _contactId } = req.params;
-    const { _id: userId } = req.user;
-    const result = await contactServices.updateContact({
-        _contactId, payload: {...req.body, userId}, options: {
-        upsert: true,
-        }
-    });
-
-    const status = result.isNew ? 201 : 200;
-
-    res.status(status).json({
-        status: 200,
-        message: "Contact upserted successfuly",
-        data: result.data,
-    });
-};
-
 export const patchContactController = async (req, res, next) => {
     try {
         const { contactId: _contactId } = req.params;
