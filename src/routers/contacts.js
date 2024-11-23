@@ -5,7 +5,7 @@ import * as contactControllers from "../controllers/contacts.js";
 import ctrlWrapper from "../utils/ctrlWrapper.js";
 import validateBody from "../utils/validateBody.js";
 import { contactAddSchema, contactUpdateSchema } from "../validation/contacts.js";
-
+import { upload } from "../middlewares/multer.js";
 
 const contactsRouter = Router();
 
@@ -15,9 +15,11 @@ contactsRouter.get("/", ctrlWrapper(contactControllers.getContactsController));
 
 contactsRouter.get("/:contactId", isValidId, ctrlWrapper(contactControllers.getContactByIdController));
 
-contactsRouter.post("/", validateBody(contactAddSchema), ctrlWrapper(contactControllers.addContactController));
+//upload.fields([{ name: "photo", maxCount: 1 }, { name: "subphoto", maxCount: 3 }]);
+// upload.array("photo", 10); - 10-max кількість фото
+contactsRouter.post("/", upload.single("photo"), validateBody(contactAddSchema), ctrlWrapper(contactControllers.addContactController));
 
-contactsRouter.patch("/:contactId", isValidId, validateBody(contactUpdateSchema), ctrlWrapper(contactControllers.patchContactController));
+contactsRouter.patch("/:contactId", upload.single("photo"), isValidId, validateBody(contactUpdateSchema), ctrlWrapper(contactControllers.patchContactController));
 
 contactsRouter.delete("/:contactId", isValidId, ctrlWrapper(contactControllers.deleteContactController));
 

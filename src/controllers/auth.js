@@ -22,20 +22,27 @@ export const registerController = async (req, res, next) => {
 
         res.status(201).json({
             status: 201,
-            message: "Successfully registered a user",
-            data: {
-                name: name,
-                email,
-                _id,
-                createdAt,
-                updatedAt,
-            },
+            message: 'User registered successfully. Please verify your email.',
+            data: { _id, name, email, createdAt, updatedAt },
         });
     } catch (error) {
         next(error);
     }
 };
 
+export const verifyController = async (req, res, next) => {
+    try {
+        const { token } = req.query;
+        await authServices.verify(token);
+
+        res.json({
+            status: 200,
+            message: "User verified successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const loginController = async (req, res, next) => {
     try {
@@ -44,40 +51,72 @@ export const loginController = async (req, res, next) => {
         setupSession(res, session);
 
         res.status(200).json({
-            status: 200,
-            message: "Successfully logged in an user!",
-            data: {
-                accessToken: session.accessToken,
-            },
+            message: "Successfully logged in a user!",
+            data: { accessToken: session.accessToken },
         });
     } catch (error) {
         next(error);
     }
 };
 
-export const refreshSessionController = async (req, res) => {
-    const session = await authServices.refreshUserSession(req.cookies);
+export const refreshSessionController = async (req, res, next) => {
+    try {
+        if (!req.cookies) {
+            throw new Error("No cookies found");
+        }
 
-    setupSession(res, session);
+        const session = await authServices.refreshUserSession(req.cookies);
+
+        setupSession(res, session);
 
         res.status(200).json({
-            status: 200,
-            message: "Successfully refresh session",
-            data: {
-                accessToken: session.accessToken,
-            },
+            message: "Successfully refreshed session",
+            data: { accessToken: session.accessToken },
         });
+    } catch (error) {
+        next(error);
+    }
 };
 
-export const logoutController = async (req, res) => {
-    const { sessionId } = req.cookies;
+export const logoutController = async (req, res, next) => {
+    try {
+        const { sessionId } = req.cookies;
 
-    if (sessionId) {
-        await authServices.logout(sessionId); 
+        if (sessionId) {
+            await authServices.logout(sessionId);
+        }
+
+        res.clearCookie("sessionId");
+        res.clearCookie("refreshToken");
+        res.status(204).send();
+    } catch (error) {
+        next(error);
     }
-    res.clearCookie("sessionId");
-    res.clearCookie("refreshToken");
+};
 
-    res.status(204).send();
+export const sendResetEmailController = async (req, res, next) => {
+    try {
+        await authServices.sendResetToken(req.body.email);
+        res.json({
+            status: 200,
+            message: "Reset password email was successfully sent!",
+            data: {},
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const resetPasswordController = async (req, res, next) => {
+    try {
+        await authServices.resetPassword(req.body);
+        res.json({
+            status: 200,
+            message: "Password was successfully reset!",
+            data: {},
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
