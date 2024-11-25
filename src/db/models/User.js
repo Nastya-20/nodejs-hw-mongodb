@@ -17,11 +17,11 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    verify: {
-        type: Boolean,
-        default: false,
-        required: true,
-    }
+    //verify: {
+    //    type: Boolean,
+    //    default: false,
+    //    required: true,
+   // }
 }, { versionKey: false, timestamps: true });
 
 userSchema.post("save", handleSaveError);

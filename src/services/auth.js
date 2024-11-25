@@ -15,7 +15,7 @@ import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { TEMPLATES_DIR } from "../constants/index.js";
 
-const emailTemplatePath = path.join(TEMPLATES_DIR, "verify-email.html",);
+//const emailTemplatePath = path.join(TEMPLATES_DIR, "verify-email.html",);
 
 const appDomain = env("APP_DOMAIN");
 const jwtSecret = env("JWT_SECRET");
@@ -32,76 +32,78 @@ const createSession = () => {
 };
 // лист з верифікацією
 export const register = async payload => {
-    const { email, password } = payload;
-    const user = await UserCollection.findOne({ email });
-    if (user) {
-        throw createHttpError(409, {
-            status: 409,
-            message: "ConflictError",
-            data: {
-                message: "Email in use",
-            },
-        });
-    }
+   const { email, password } = payload;
+   const user = await UserCollection.findOne({ email });
+   if (user) {
+       throw createHttpError(409, {
+         status: 409,
+         message: "ConflictError",
+          data: {
+          message: "Email in use",
+         },
+       });
+   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-  const newUser = await UserCollection.create({...payload, password: hashPassword});
-
- const templateSource = await fs.readFile(emailTemplatePath, "utf-8");
- const template = Handlebars.compile(templateSource);
-  const token = jwt.sign(
-    { email },
-    jwtSecret,
-    { expiresIn: "1h" }
-  );
- const html = template({
-  link: `${appDomain}/auth/verify?token=${token}`
-});
-
-  const verifyEmail = {
-    from: process.env.SMTP_FROM,
-    to: email,
-    subject: "Verify email",
-    html,
-  };
-
-  try {
-    await sendEmail(verifyEmail);
-    console.log('Verification email sent successfully');
-  } catch (error) {
-    console.error("Email sending failed:", error.message);
-    await UserCollection.findByIdAndDelete(newUser._id);
-    throw createHttpError(500, "Failed to send verification email");
-  }
-
-  return newUser;
+  return UserCollection.create({...payload, password: hashPassword});
 };
+  //const newUser = await UserCollection.create({...payload, password: hashPassword});
 
-export const verify = async token => {
-  try {
-    const { email } = jwt.verify(token, jwtSecret);
-    const user = await findUser({ email });
-    if (!user) {
-      throw createHttpError(404, `${email} not found`);
-    }
-    return await UserCollection.findByIdAndUpdate(user._id, { verify: true });
-  }
-  catch (error) {
-    if (error.name === "TokenExpiredError" || error.name === "JsonWebTokenError") {
-      throw createHttpError(401, "Token is expired or invalid.");
-    }
-    throw error;
-  }
-};
+ //const templateSource = await fs.readFile(emailTemplatePath, "utf-8");
+ //const template = Handlebars.compile(templateSource);
+  //const token = jwt.sign(
+   // { email },
+   // jwtSecret,
+   // { expiresIn: "1h" }
+  //);
+ //const html = template({
+  //link: `${appDomain}/auth/verify?token=${token}`
+//});
+
+ // const verifyEmail = {
+   // from: process.env.SMTP_FROM,
+  //  to: email,
+   // subject: "Verify email",
+   // html,
+ // };
+
+  //try {
+   // await sendEmail(verifyEmail);
+   // console.log('Verification email sent successfully');
+ // } catch (error) {
+  //  console.error("Email sending failed:", error.message);
+  //  await UserCollection.findByIdAndDelete(newUser._id);
+ //   throw createHttpError(500, "Failed to send verification email");
+ // }
+
+ //return newUser;
+//};
+
+//export const verify = async token => {
+ // try {
+  //  const { email } = jwt.verify(token, jwtSecret);
+  //  const user = await findUser({ email });
+  //  if (!user) {
+  //    throw createHttpError(404, `${email} not found`);
+  //  }
+  //  return await UserCollection.findByIdAndUpdate(user._id, { verify: true });
+ // }
+  //catch (error) {
+  //  if (error.name === "TokenExpiredError" || error.name === "JsonWebTokenError") {
+  //    throw createHttpError(401, "Token is expired or invalid.");
+  //  }
+  //  throw error;
+ // }
+//};
 
 export const login = async ({ email, password }) => {
     const user = await UserCollection.findOne({ email });
     if (!user) {
         throw createHttpError(401, "Email or password invalid");
     }
-    if (!user.verify) {
-    throw createHttpError(401, "Email not verified");
-  }
+   // if (!user.verify) {
+   // throw createHttpError(401, "Email not verified");
+ // }
    const passwordCompare = await bcrypt.compare(password, user.password);
    if (!passwordCompare) {
     throw createHttpError(401, "Email or password invalid");

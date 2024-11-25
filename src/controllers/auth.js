@@ -22,7 +22,7 @@ export const registerController = async (req, res, next) => {
 
         res.status(201).json({
             status: 201,
-            message: 'User registered successfully. Please verify your email.',
+            message: 'User registered successfully!',// Please verify your email.
             data: { _id, name, email, createdAt, updatedAt },
         });
     } catch (error) {
@@ -30,19 +30,19 @@ export const registerController = async (req, res, next) => {
     }
 };
 
-export const verifyController = async (req, res, next) => {
-    try {
-        const { token } = req.query;
-        await authServices.verify(token);
+//export const verifyController = async (req, res, next) => {
+   // try {
+     //   const { token } = req.query;
+     //   await authServices.verify(token);
 
-        res.json({
-            status: 200,
-            message: "User verified successfully",
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+      //  res.json({
+       //     status: 200,
+       //     message: "User verified successfully",
+       // });
+  //  } catch (error) {
+  //      next(error);
+  //  }
+//};
 
 export const loginController = async (req, res, next) => {
     try {
@@ -70,7 +70,7 @@ export const refreshSessionController = async (req, res, next) => {
         setupSession(res, session);
 
         res.status(200).json({
-            message: "Successfully refreshed session",
+            message: "Successfully refreshed session!",
             data: { accessToken: session.accessToken },
         });
     } catch (error) {
