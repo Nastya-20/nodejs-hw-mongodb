@@ -48,8 +48,18 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const addContactController = async (req, res) => {
-    const { _id: userId } = req.user;
-    const payload = { ...req.body, userId };
+  const { _id: userId } = req.user;
+  let photo = null;
+  if (req.file) {
+    if (enableCloudinary === "true") {
+      photo = await saveFileToCloudinary(req.file, "photos");
+    }
+    else {
+     await saveFileToUploadDir(req.file);
+     photo = path.join(req.file.filename);
+    }
+  }
+    const payload = { ...req.body, photo, userId };
 
     const data = await contactServices.addContact(payload);
 
@@ -61,45 +71,32 @@ export const addContactController = async (req, res) => {
 };
 
 export const patchContactController = async (req, res, next) => {
-  try {
-    const { contactId: _contactId } = req.params;
-    const { _id: userId } = req.user;
-    let photo = null;
+    try {
+        const { contactId: _contactId } = req.params;
+        const { _id: userId } = req.user;
 
-    if (req.file) {
-      if (enableCloudinary === "true") {
-        photo = await saveFileToCloudinary(req.file, "contacts");
-      } else {
-        await saveFileToUploadDir(req.file);
-        photo = path.join("uploads", req.file.filename);
-      }
+        const payload = { ...req.body };
+
+        const updatedContact = await contactServices.updateContact({
+            _contactId,
+            payload,
+            userId,
+        });
+
+         if (!updatedContact) {
+            throw createHttpError(404, {
+                message: `Contact with id=${_contactId} not found`,
+            });
+        }
+
+        res.status(200).json({
+            status: 200,
+            message: "Successfully patched the contact!",
+            data: updatedContact,
+        });
+    } catch (error) {
+        next(error);
     }
-
-    const payload = { ...req.body };
-    if (photo) {
-      payload.photo = photo; 
-    }
-
-    const updatedContact = await contactServices.updateContact({
-      _contactId,
-      payload,
-      userId,
-    });
-
-    if (!updatedContact) {
-      throw createHttpError(404, {
-        message: `Contact with id=${_contactId} not found`,
-      });
-    }
-
-    res.status(200).json({
-      status: 200,
-      message: "Successfully patched the contact!",
-      data: updatedContact,
-    });
-  } catch (error) {
-    next(error);
-  }
 };
 
 export const deleteContactController = async (req, res, next) => {
