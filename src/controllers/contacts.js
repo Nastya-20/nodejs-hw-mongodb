@@ -74,16 +74,34 @@ export const patchContactController = async (req, res, next) => {
     try {
         const { contactId: _contactId } = req.params;
         const { _id: userId } = req.user;
+        const photo = req.file;
 
-        const payload = { ...req.body };
+        let photoUrl;
 
+        // Обробка нового фото
+        if (photo) {
+            if (enableCloudinary === "true") {
+                photoUrl = await saveFileToCloudinary(photo, "photos");
+            } else {
+                await saveFileToUploadDir(photo);
+                photoUrl = path.join(photo.filename);
+            }
+        }
+
+        // Створюємо payload з новими даними
+        const payload = {
+            ...req.body,
+            ...(photoUrl && { photo: photoUrl }) // Додаємо фото, якщо є нове
+        };
+
+        // Оновлення контакту
         const updatedContact = await contactServices.updateContact({
             _contactId,
             payload,
             userId,
         });
 
-         if (!updatedContact) {
+        if (!updatedContact) {
             throw createHttpError(404, {
                 message: `Contact with id=${_contactId} not found`,
             });
@@ -98,6 +116,7 @@ export const patchContactController = async (req, res, next) => {
         next(error);
     }
 };
+
 
 export const deleteContactController = async (req, res, next) => {
     try {

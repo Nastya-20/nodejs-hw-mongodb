@@ -3,6 +3,7 @@ import { unlink } from "node:fs/promises";
 import { env } from "./env.js";
 
 cloudinary.config({
+  secure: true,
   cloud_name: env("CLOUDINARY_CLOUD_NAME"),
   api_key: env("CLOUDINARY_API_KEY"),
   api_secret: env("CLOUDINARY_API_SECRET"),
@@ -10,26 +11,26 @@ cloudinary.config({
 
 export const saveFileToCloudinary = async (file, folder) => {
   if (!file?.path) {
-    throw new Error("File path is required.");
+   throw new Error("File path is required.");
   }
-  if (!folder) {
+ if (!folder) {
     throw new Error("Folder name is required.");
   }
 
-  try {
+ try {
     const response = await cloudinary.uploader.upload(file.path, {
-      folder: 'photos',
-    });
-    return response.secure_url;
+     folder: 'photos',
+   });
+   return response.secure_url;
   } catch (error) {
-    console.error("Cloudinary upload failed:", error.message);
+   console.error("Cloudinary upload failed:", error.message);
     throw new Error("Failed to upload file to Cloudinary.");
-  } finally {
-    try {
-      await unlink(file.path);
-    } catch (err) {
-      console.error("Failed to delete local file:", err.message);
-    }
+ } finally {
+   try {
+     await unlink(file.path);
+   } catch (err) {
+     console.error("Failed to delete local file:", err.message);
+   }
   }
 };
 
