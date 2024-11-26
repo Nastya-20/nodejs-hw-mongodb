@@ -38,5 +38,6 @@ export const contactUpdateSchema = Joi.object({
     }),
     contactType: Joi.string().min(3).max(20).valid(...typeList),
     email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }).message('Invalid email format'),
-    isFavourite: Joi.boolean()
+    isFavourite: Joi.boolean(),
+    photo: Joi.string().optional(),
 }).min(1);
