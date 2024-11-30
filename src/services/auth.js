@@ -9,11 +9,13 @@ import jwt from 'jsonwebtoken';
 import { SMTP } from '../constants/index.js';
 import { env } from '../utils/env.js';
 import { sendEmail } from '../utils/sendEmail.js';
+import { validateCode, getNameFromGoogleTokenPayload } from "../utils/googleOAuth2.js";
 
 import Handlebars from 'handlebars';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { TEMPLATES_DIR } from "../constants/index.js";
+
 
 //const emailTemplatePath = path.join(TEMPLATES_DIR, "verify-email.html",);
 
@@ -136,12 +138,6 @@ export const refreshUserSession = async ({sessionId, refreshToken}) => {
     });
 };
 
-export const logout = async (sessionId) => {
-    if (sessionId) {
-        await SessionCollection.deleteOne({ _id: sessionId });
-    }
-};
-
 // лист для зміни паролю
 export const sendResetToken = async (email) => {
   try {
@@ -220,6 +216,39 @@ export const resetPassword = async (payload) => {
     console.error('Error in resetPassword:', error.message);
     throw createHttpError(500, 'An unexpected error occurred');
   }
+};
+
+export const loginOrRegisterWithGoogle = async code => {
+  const loginTicket = await validateCode(code);
+  const payload = loginTicket.getPayload();
+  if (!payload) {
+    throw createHttpError(401);
+  }
+  let user = await UserCollection.findOne({
+    email: payload.email,
+  });
+  if (!user) {
+    const password = await bcrypt.hash(randomBytes(10), 10);
+    const name = getNameFromGoogleTokenPayload(payload);
+
+    user = await UserCollection.create({
+      email: payload.email,
+      name,
+      password,
+    });
+  }
+  const newSession = createSession();
+
+    return SessionCollection.create({
+        userId: user._id,
+        ...newSession,
+    });
+};
+
+export const logout = async (sessionId) => {
+    if (sessionId) {
+        await SessionCollection.deleteOne({ _id: sessionId });
+    }
 };
 
 export const findSession = filter => SessionCollection.findOne(filter);
