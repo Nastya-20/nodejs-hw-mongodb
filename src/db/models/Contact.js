@@ -30,8 +30,8 @@ const contactSchema = new Schema({
         required: true,
     },
      photo: {
-         type: String,
-        // default: null,
+        type: String,
+        default: null,
     },
 }, {
     versionKey: false,
