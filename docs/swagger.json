@@ -501,7 +501,17 @@
         ],
         "responses": {
           "204": {
-            "description": "Successfully deleted the contact"
+            "description": "Contact deleted successfully."
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/401"
+                }
+              }
+            }
           },
           "404": {
             "$ref": "#/components/responses/404"
@@ -519,6 +529,30 @@
       }
     },
     "schemas": {
+      "401": {
+        "description": "Unauthorized error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status",
+                "message"
+              ],
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 401
+                },
+                "message": {
+                  "type": "string",
+                  "example": "UnauthorizedError"
+                }
+              }
+            }
+          }
+        }
+      },
       "Contact": {
         "type": "object",
         "required": [
