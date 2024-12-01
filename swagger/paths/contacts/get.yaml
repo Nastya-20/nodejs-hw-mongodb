@@ -102,7 +102,7 @@ responses:
               message: Successfully retrieved contacts!
               data:
                 data:
-                  - _contactid: 65ca67e7ae7f10c88b598384
+                  - _id: 65ca67e7ae7f10c88b598384
                     name: John Doe
                     phoneNumber: '+382665489'
                     email: john.doe@example.com
