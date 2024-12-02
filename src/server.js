@@ -20,15 +20,13 @@ export const setupServer = () => {
 
     app.use(logger);
 
+    app.use('/uploads', express.static(UPLOAD_DIR));
+
     app.use("/auth", authRouter);
     app.use("/contacts", contactsRouter);
-    app.use("/api-dogs", swaggerDocs());
-
-     app.use('/uploads', express.static(UPLOAD_DIR));
-    app.use('/api-docs', swaggerDocs());
+    app.use("/api-docs", swaggerDocs());
 
     app.use(notFoundHandler);
-
     app.use(errorHandler);
 
     const port = Number(env("PORT", 3000));
