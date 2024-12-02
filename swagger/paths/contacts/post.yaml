@@ -6,11 +6,16 @@ description: 'Create a contact with payload'
 security:
   - bearerAuth: []
 requestBody:
-  required: true
   content:
     multipart/form-data:
       schema:
         type: object
+        required:
+          - name
+          - phoneNumber
+          - email
+          - contactType
+          - isFavourite
         properties:
           name:
             description: "Contact's name"
