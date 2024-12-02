@@ -222,11 +222,17 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "name",
+                  "phoneNumber",
+                  "email",
+                  "contactType",
+                  "isFavourite"
+                ],
                 "properties": {
                   "name": {
                     "description": "Contact's name",
@@ -355,6 +361,7 @@
                       "example": "Successfully found contact with ID 65ca67e7ae7f10c88b598384."
                     },
                     "data": {
+                      "type": "object",
                       "$ref": "#/components/schemas/Contact"
                     }
                   }
