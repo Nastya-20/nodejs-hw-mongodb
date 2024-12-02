@@ -14,7 +14,8 @@ tags:
     description: Auth operations.
 servers:
   - url: http://localhost:3000
-  - url: https://nodejs-hw-mongodb-hthg.onrender.com/api-docs/contacts
+  - url: https://nodejs-hw-mongodb-hthg.onrender.com
+  
 paths:
   /contacts:
     get:
