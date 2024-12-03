@@ -229,9 +229,7 @@
                 "required": [
                   "name",
                   "phoneNumber",
-                  "email",
-                  "contactType",
-                  "isFavourite"
+                  "contactType"
                 ],
                 "properties": {
                   "name": {
